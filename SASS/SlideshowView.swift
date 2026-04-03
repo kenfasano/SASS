@@ -28,6 +28,7 @@ struct SlideshowView: View {
                         .frame(width: layer.size.width, height: layer.size.height)
                         .position(layer.position)
                         .opacity(layer.opacity)
+                        .blendMode(.screen)  
                 }
             }
             .frame(width: geo.size.width, height: geo.size.height)
