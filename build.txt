@@ -1,0 +1,154 @@
+error: emit-module command failed with exit code 1 (use -v to see invocation)
+/Users/kenfasano/Xcode/SASS/SASS/CheckerboardTransition.swift:2:19: error: cannot find type 'CGFloat' in scope
+ 1 | struct CheckerboardModifier: AnimatableModifier {
+ 2 |     var progress: CGFloat // 0 = fully hidden, 1 = fully visible
+   |                   `- error: cannot find type 'CGFloat' in scope
+ 3 |     let tileSize: CGFloat
+ 4 | 
+
+/Users/kenfasano/Xcode/SASS/SASS/CheckerboardTransition.swift:3:19: error: cannot find type 'CGFloat' in scope
+ 1 | struct CheckerboardModifier: AnimatableModifier {
+ 2 |     var progress: CGFloat // 0 = fully hidden, 1 = fully visible
+ 3 |     let tileSize: CGFloat
+   |                   `- error: cannot find type 'CGFloat' in scope
+ 4 | 
+ 5 |     var animatableData: CGFloat {
+
+/Users/kenfasano/Xcode/SASS/SASS/CheckerboardTransition.swift:5:25: error: cannot find type 'CGFloat' in scope
+ 3 |     let tileSize: CGFloat
+ 4 | 
+ 5 |     var animatableData: CGFloat {
+   |                         `- error: cannot find type 'CGFloat' in scope
+ 6 |         get { progress }
+ 7 |         set { progress = newValue }
+
+/Users/kenfasano/Xcode/SASS/SASS/CheckerboardTransition.swift:10:41: error: cannot find type 'View' in scope
+ 8 |     }
+ 9 | 
+10 |     func body(content: Content) -> some View {
+   |                                         `- error: cannot find type 'View' in scope
+11 |         content.mask(
+12 |             Canvas { ctx, size in
+
+/Users/kenfasano/Xcode/SASS/SASS/CheckerboardTransition.swift:10:36: error: 'some' types are only permitted in properties, subscripts, and functions
+ 8 |     }
+ 9 | 
+10 |     func body(content: Content) -> some View {
+   |                                    `- error: 'some' types are only permitted in properties, subscripts, and functions
+11 |         content.mask(
+12 |             Canvas { ctx, size in
+
+/Users/kenfasano/Xcode/SASS/SASS/CheckerboardTransition.swift:10:24: error: cannot find type 'Content' in scope
+ 8 |     }
+ 9 | 
+10 |     func body(content: Content) -> some View {
+   |                        `- error: cannot find type 'Content' in scope
+11 |         content.mask(
+12 |             Canvas { ctx, size in
+
+/Users/kenfasano/Xcode/SASS/SASS/CheckerboardTransition.swift:1:30: error: cannot find type 'AnimatableModifier' in scope
+ 1 | struct CheckerboardModifier: AnimatableModifier {
+   |                              `- error: cannot find type 'AnimatableModifier' in scope
+ 2 |     var progress: CGFloat // 0 = fully hidden, 1 = fully visible
+ 3 |     let tileSize: CGFloat
+
+/Users/kenfasano/Xcode/SASS/SASS/CheckerboardTransition.swift:38:11: error: cannot find type 'AnyTransition' in scope
+36 | }
+37 | 
+38 | extension AnyTransition {
+   |           `- error: cannot find type 'AnyTransition' in scope
+39 |     static var checkerboard: AnyTransition {
+40 |         .modifier(
+
+/Users/kenfasano/Xcode/SASS/SASS/RollOffTransition.swift:2:18: error: cannot find type 'CGFloat' in scope; did you mean to use 'CGFloat'?
+ 1 | struct RollTransition: ViewModifier {
+ 2 |     let offsetX: CGFloat
+   |                  `- error: cannot find type 'CGFloat' in scope; did you mean to use 'CGFloat'?
+ 3 |     let rotation: Double // degrees
+ 4 | 
+
+/Users/kenfasano/Xcode/SASS/SASS/RollOffTransition.swift:5:41: error: cannot find type 'View' in scope
+ 3 |     let rotation: Double // degrees
+ 4 | 
+ 5 |     func body(content: Content) -> some View {
+   |                                         `- error: cannot find type 'View' in scope
+ 6 |         content
+ 7 |             .offset(x: offsetX)
+
+/Users/kenfasano/Xcode/SASS/SASS/RollOffTransition.swift:5:36: error: 'some' types are only permitted in properties, subscripts, and functions
+ 3 |     let rotation: Double // degrees
+ 4 | 
+ 5 |     func body(content: Content) -> some View {
+   |                                    `- error: 'some' types are only permitted in properties, subscripts, and functions
+ 6 |         content
+ 7 |             .offset(x: offsetX)
+
+/Users/kenfasano/Xcode/SASS/SASS/RollOffTransition.swift:5:24: error: cannot find type 'Content' in scope
+ 3 |     let rotation: Double // degrees
+ 4 | 
+ 5 |     func body(content: Content) -> some View {
+   |                        `- error: cannot find type 'Content' in scope
+ 6 |         content
+ 7 |             .offset(x: offsetX)
+
+/Users/kenfasano/Xcode/SASS/SASS/RollOffTransition.swift:1:24: error: cannot find type 'ViewModifier' in scope
+ 1 | struct RollTransition: ViewModifier {
+   |                        `- error: cannot find type 'ViewModifier' in scope
+ 2 |     let offsetX: CGFloat
+ 3 |     let rotation: Double // degrees
+
+/Users/kenfasano/Xcode/SASS/SASS/RollOffTransition.swift:12:11: error: cannot find type 'AnyTransition' in scope
+10 | }
+11 | 
+12 | extension AnyTransition {
+   |           `- error: cannot find type 'AnyTransition' in scope
+13 |     static func rollOff(edge: Edge) -> AnyTransition {
+14 |         let sign: CGFloat = edge == .leading ? -1 : 1
+
+/Users/kenfasano/Xcode/SASS/SASS/SlideshowView.swift:28:6: error: type 'AnyTransition' has no member 'checkerboard'
+ 26 |     .offset(x: 80, y: 0).combined(with: .opacity),
+ 27 |     .offset(x: 0, y: 80).combined(with: .opacity),
+ 28 |     .checkerboard,
+    |      `- error: type 'AnyTransition' has no member 'checkerboard'
+ 29 |     .asymmetric(insertion: .rollOff(edge: .trailing), removal: .identity),
+ 30 | ]
+
+/Users/kenfasano/Xcode/SASS/SASS/SlideshowView.swift:29:29: error: type 'AnyTransition' has no member 'rollOff'
+ 27 |     .offset(x: 0, y: 80).combined(with: .opacity),
+ 28 |     .checkerboard,
+ 29 |     .asymmetric(insertion: .rollOff(edge: .trailing), removal: .identity),
+    |                             `- error: type 'AnyTransition' has no member 'rollOff'
+ 30 | ]
+ 31 | 
+
+/Users/kenfasano/Xcode/SASS/SASS/SlideshowView.swift:29:44: error: cannot infer contextual base in reference to member 'trailing'
+ 27 |     .offset(x: 0, y: 80).combined(with: .opacity),
+ 28 |     .checkerboard,
+ 29 |     .asymmetric(insertion: .rollOff(edge: .trailing), removal: .identity),
+    |                                            `- error: cannot infer contextual base in reference to member 'trailing'
+ 30 | ]
+ 31 | 
+
+/Users/kenfasano/Xcode/SASS/SASS/SlideshowView.swift:43:6: error: type 'AnyTransition' has no member 'checkerboard'
+ 41 |     .offset(x: 80, y: 0).combined(with: .opacity),
+ 42 |     .offset(x: 0, y: 80).combined(with: .opacity),
+ 43 |     .checkerboard,
+    |      `- error: type 'AnyTransition' has no member 'checkerboard'
+ 44 |     .asymmetric(insertion: .rollOff(edge: .trailing), removal: .identity),
+ 45 | ]
+
+/Users/kenfasano/Xcode/SASS/SASS/SlideshowView.swift:44:29: error: type 'AnyTransition' has no member 'rollOff'
+ 42 |     .offset(x: 0, y: 80).combined(with: .opacity),
+ 43 |     .checkerboard,
+ 44 |     .asymmetric(insertion: .rollOff(edge: .trailing), removal: .identity),
+    |                             `- error: type 'AnyTransition' has no member 'rollOff'
+ 45 | ]
+ 46 | 
+
+/Users/kenfasano/Xcode/SASS/SASS/SlideshowView.swift:44:44: error: cannot infer contextual base in reference to member 'trailing'
+ 42 |     .offset(x: 0, y: 80).combined(with: .opacity),
+ 43 |     .checkerboard,
+ 44 |     .asymmetric(insertion: .rollOff(edge: .trailing), removal: .identity),
+    |                                            `- error: cannot infer contextual base in reference to member 'trailing'
+ 45 | ]
+ 46 | 

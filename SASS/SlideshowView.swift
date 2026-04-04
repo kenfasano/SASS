@@ -25,6 +25,8 @@ private let insertionTransitions: [AnyTransition] = [
     .slide.combined(with: .opacity),
     .offset(x: 80, y: 0).combined(with: .opacity),
     .offset(x: 0, y: 80).combined(with: .opacity),
+    .checkerboard,
+    .asymmetric(insertion: .rollOff(edge: .trailing), removal: .identity),
 ]
 
 private let removalTransitions: [AnyTransition] = [
@@ -38,6 +40,8 @@ private let removalTransitions: [AnyTransition] = [
     .slide.combined(with: .opacity),
     .offset(x: 80, y: 0).combined(with: .opacity),
     .offset(x: 0, y: 80).combined(with: .opacity),
+    .checkerboard,
+    .asymmetric(insertion: .rollOff(edge: .trailing), removal: .identity),
 ]
 
 private func randomTransition() -> AnyTransition {
