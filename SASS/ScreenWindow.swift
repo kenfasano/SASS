@@ -27,20 +27,33 @@ class ScreenWindow: NSWindow {
         self.contentView = hosting
         self.hostingView = hosting
 
-        // Cover the full screen including menu bar
         setFrame(screen.frame, display: true)
     }
 
-    // Quit on any key press
     override func keyDown(with event: NSEvent) {
+        let cmd  = event.modifierFlags.contains(.command)
+        let char = event.charactersIgnoringModifiers ?? ""
+        sassLog("keyDown char='\(char)' cmd=\(cmd) keyCode=\(event.keyCode)")
+
+        if cmd {
+            if char == "," {
+                sassLog("cmd-, detected — calling show()")
+                ConfigurationWindowController.shared.show()
+                return
+            }
+            if NSApp.mainMenu?.performKeyEquivalent(with: event) == true {
+                return
+            }
+        }
+
+        // Any plain key (or unhandled combo) → quit
         NSApp.terminate(nil)
     }
 
-    // Quit on mouse click
     override func mouseDown(with event: NSEvent) {
         NSApp.terminate(nil)
     }
 
-    override var canBecomeKey: Bool { true }
-    override var canBecomeMain: Bool { true }
+    override var canBecomeKey:  Bool { !ignoresMouseEvents }
+    override var canBecomeMain: Bool { !ignoresMouseEvents }
 }

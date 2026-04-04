@@ -2,11 +2,14 @@ import Foundation
 import AppKit
 
 struct ImageLoader {
-    static let imageDirectory = URL(
-        fileURLWithPath: "/Users/kenfasano/Scripts/ScreenArt/Images/TransformedImages"
-    )
 
-    /// Returns image URLs from the directory, sorted newest-first.
+    /// Always reads the current directory from AppSettings so it reflects
+    /// whatever the user configured in the Configuration dialog.
+    static var imageDirectory: URL {
+        AppSettings.shared.imageDirectoryURL
+    }
+
+    /// Returns image URLs from the configured directory, sorted newest-first.
     static func loadImageURLs() -> [URL] {
         let fm = FileManager.default
         guard let contents = try? fm.contentsOfDirectory(

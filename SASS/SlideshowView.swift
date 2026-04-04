@@ -88,6 +88,15 @@ struct SlideshowView: View {
             }
         }
         .ignoresSafeArea()
+        .onReceive(NotificationCenter.default.publisher(for: .sassRestartSlideshow)) { _ in
+            controller.restart()
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .sassPauseSlideshow)) { _ in
+            controller.pause()
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .sassResumeSlideshow)) { _ in
+            controller.resume()
+        }
     }
 }
 
@@ -101,25 +110,40 @@ class SlideshowController: ObservableObject {
     private var viewSize: CGSize = .zero
     private var slotTasks: [Task<Void, Never>] = []
 
-    // Config
-    private let slotCount = 8
-    private let fibonacciSeconds: [Double] = [1, 2, 3, 5, 8, 13]
-    private let fadeDuration: Double = 0.6
+    // Settings are read fresh inside each slot loop, so live-updating is free.
+    private var settings: AppSettings { AppSettings.shared }
 
-    // Image size as fraction of the screen's shorter dimension
-    private let minSizeFraction: CGFloat = 0.10
-    private let maxSizeFraction: CGFloat = 0.55
+    private var isPaused = false
+
+    func pause() {
+        isPaused = true
+    }
+
+    func resume() {
+        isPaused = false
+    }
 
     func start(viewSize: CGSize) {
         self.viewSize = viewSize
         self.imageURLs = ImageLoader.loadImageURLs()
+        spawnSlots()
+    }
+
+    func restart() {
+        stopSlots()
+        layers.removeAll()
+        imageURLs = ImageLoader.loadImageURLs()
+        spawnSlots()
+    }
+
+    private func spawnSlots() {
         guard !imageURLs.isEmpty else { return }
 
-        slotTasks.forEach { $0.cancel() }
-        slotTasks = []
+        let count = settings.slotCount
+        let maxInterval = settings.maxInterval
 
-        for slot in 0..<slotCount {
-            let staggerDelay = Double(slot) * (fibonacciSeconds.max()! / Double(slotCount))
+        for slot in 0..<count {
+            let staggerDelay = Double(slot) * (maxInterval / Double(count))
             let task = Task {
                 try? await Task.sleep(nanoseconds: UInt64(staggerDelay * 1_000_000_000))
                 await runSlot()
@@ -128,16 +152,28 @@ class SlideshowController: ObservableObject {
         }
     }
 
+    private func stopSlots() {
+        slotTasks.forEach { $0.cancel() }
+        slotTasks = []
+    }
+
     private func runSlot() async {
         while !Task.isCancelled {
-            let interval = fibonacciSeconds.randomElement()!
+            // Read settings fresh each iteration so changes take effect without restart
+            let s = settings
+
+            let interval = Double.random(in: s.minInterval...s.maxInterval)
             try? await Task.sleep(nanoseconds: UInt64(interval * 1_000_000_000))
             if Task.isCancelled { break }
 
+            // Occasionally reload the image list (catches new files)
             if Int.random(in: 0..<20) == 0 {
                 let fresh = ImageLoader.loadImageURLs()
                 if !fresh.isEmpty { imageURLs = fresh }
             }
+
+            // Don't touch the view while config dialog is open
+            if isPaused { continue }
 
             guard let url = imageURLs.randomElement(),
                   let nsImage = ImageLoader.loadImage(url: url) else { continue }
@@ -147,23 +183,25 @@ class SlideshowController: ObservableObject {
             let insertAnim = insertionAnimations.randomElement()!
             let removeAnim = removalAnimations.randomElement()!
 
-            // Fade in with random insertion animation
-            withAnimation(insertAnim) {
-                layers.append(layer)
-            }
+            // Fade in
+            withAnimation(insertAnim) { layers.append(layer) }
             let layerID = layer.id
 
             // Hold
-            let hold = fibonacciSeconds.randomElement()!
-            try? await Task.sleep(nanoseconds: UInt64((hold + fadeDuration) * 1_000_000_000))
-
-            // Fade out with random removal animation
-            withAnimation(removeAnim) {
-                layers.removeAll { $0.id == layerID }
+            let hold = Double.random(in: s.minHold...s.maxHold)
+            try? await Task.sleep(nanoseconds: UInt64((hold + s.fadeDuration) * 1_000_000_000))
+            if Task.isCancelled {
+                withAnimation(removeAnim) { layers.removeAll { $0.id == layerID } }
+                break
             }
 
-            // Wait for removal animation to complete before looping
-            try? await Task.sleep(nanoseconds: UInt64(fadeDuration * 1_000_000_000))
+            // Fade out (skip if paused — layer will stay frozen on screen)
+            if !isPaused {
+                withAnimation(removeAnim) { layers.removeAll { $0.id == layerID } }
+            }
+
+            // Wait for removal animation before looping
+            try? await Task.sleep(nanoseconds: UInt64(s.fadeDuration * 1_000_000_000))
         }
     }
 
@@ -172,8 +210,9 @@ class SlideshowController: ObservableObject {
     private func makeLayer(image: NSImage) -> ImageLayer? {
         guard viewSize.width > 0, viewSize.height > 0 else { return nil }
 
-        let shorter = min(viewSize.width, viewSize.height)
-        let fraction = CGFloat.random(in: minSizeFraction...maxSizeFraction)
+        let s = settings
+        let shorter  = min(viewSize.width, viewSize.height)
+        let fraction = CGFloat.random(in: s.minSizeFraction...s.maxSizeFraction)
         let targetDim = shorter * fraction
 
         let naturalSize = image.size
@@ -185,20 +224,17 @@ class SlideshowController: ObservableObject {
         size.width  = min(size.width,  viewSize.width)
         size.height = min(size.height, viewSize.height)
 
-        let halfW = size.width / 2
+        let halfW = size.width  / 2
         let halfH = size.height / 2
-
         let xRange = halfW...max(halfW, viewSize.width  - halfW)
         let yRange = halfH...max(halfH, viewSize.height - halfH)
 
-        let x = CGFloat.random(in: xRange)
-        let y = CGFloat.random(in: yRange)
-
         return ImageLayer(
-            image: image,
-            position: CGPoint(x: x, y: y),
-            size: size,
-            opacity: 1.0,
+            image:      image,
+            position:   CGPoint(x: CGFloat.random(in: xRange),
+                                y: CGFloat.random(in: yRange)),
+            size:       size,
+            opacity:    1.0,
             transition: randomTransition()
         )
     }
